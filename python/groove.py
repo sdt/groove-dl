@@ -224,7 +224,7 @@ if __name__ == "__main__":
     markTimer.start()
     try:
         p.wait() #Wait for wget to finish
-        mp3name = u'%s - %s.mp3' % (s[songid]["ArtistName"], s[songid]["SongName"])
+        mp3name = u'%s - %s - %02d - %s.mp3' % (s[songid]["ArtistName"], s[songid]["AlbumName"], int(s[songid]["TrackNum"]), s[songid]["SongName"])
         os.rename(filename.encode('utf-8'), mp3name.encode('utf-8'))
     except KeyboardInterrupt: #If we are interrupted by the user
         os.remove(filename)
