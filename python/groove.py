@@ -203,7 +203,7 @@ if __name__ == "__main__":
         print "No results found"
         exit()
     else:
-        print '\n'.join(l) #Print the results
+        print u'\n'.join(l).encode('utf-8') #Print the results
     songid = raw_input("Enter the Song ID you wish to download or (q) to exit: ")
     if songid == "" or songid == "q": exit() #Exit if choice is empty or q
     songid = eval(songid)-1 #Turn it into an int and subtract one to fit it into the list index
@@ -216,14 +216,18 @@ if __name__ == "__main__":
     if stream == []:
         print "Failed"
         exit()
-    cmd = 'wget --post-data=streamKey=%s -O "%s - %s.mp3" "http://%s/stream.php"' % (stream["streamKey"], s[songid]["ArtistName"], s[songid]["SongName"], stream["ip"]) #Run wget to download the song
+
+    filename = "%s.mp3" % (s[songid]["SongID"])
+    cmd = 'wget --post-data=streamKey=%s -O "%s" "http://%s/stream.php"' % (stream["streamKey"], filename, stream["ip"]) #Run wget to download the song
     p = subprocess.Popen(cmd, shell=True)
     markTimer = threading.Timer(30 + random.randint(0,5), markStreamKeyOver30Seconds, [s[songid]["SongID"], str(queueID), stream["ip"], stream["streamKey"]]) #Starts a timer that reports the song as being played for over 30-35 seconds. May not be needed.
     markTimer.start()
     try:
         p.wait() #Wait for wget to finish
+        mp3name = u'%s - %s.mp3' % (s[songid]["ArtistName"], s[songid]["SongName"])
+        os.rename(filename.encode('utf-8'), mp3name.encode('utf-8'))
     except KeyboardInterrupt: #If we are interrupted by the user
-        os.remove('%s - %s.mp3' % (s[songid]["ArtistName"], s[songid]["SongName"])) #Delete the song
+        os.remove(filename)
         print "\nDownload cancelled. File deleted."
     markTimer.cancel()
     print "Marking song as completed"
